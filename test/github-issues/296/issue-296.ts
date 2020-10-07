@@ -18,7 +18,7 @@ describe("github issues > #296 select additional computed columns", () => {
     after(() => closeTestingConnections(connections));
 
     it("github issues > #296 should correctly select computed columns and mapping inside entity values", () => Promise.all(connections.map(async connection => {
- const user1 = new User();
+        const user1 = new User();
         user1.name = "Antonio";
         user1.surname = "Duprez";
         await connection.manager.save(user1);
