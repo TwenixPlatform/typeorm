@@ -18,7 +18,7 @@ describe("github issues > #296 select additional computed columns", () => {
     after(() => closeTestingConnections(connections));
 
     it("github issues > #296 should correctly select computed columns and mapping inside entity values", () => Promise.all(connections.map(async connection => {
-        const user1 = new User();
+ const user1 = new User();
         user1.name = "Antonio";
         user1.surname = "Duprez";
         await connection.manager.save(user1);
@@ -31,6 +31,7 @@ describe("github issues > #296 select additional computed columns", () => {
         const post = new Post();
         post.title = "Implement addSelectAndMap in TypeORM";
         post.userId = user1.id;
+        post.transformedInt = true;
         await connection.manager.save(post);
 
         const comment1 = new Comment();
@@ -50,6 +51,7 @@ describe("github issues > #296 select additional computed columns", () => {
                 .innerJoin("post.user", "user")
                 .innerJoin("post.comments", "comments")
                 .select(["post.id", "post.title", "user.id", "user.name", "user.surname", "comments.id", "comments.comment"]) // We need select the id of each entity for a correct mapping. This is required
+                .addSelectAndMap("post.transformedInt", "transformedInt", "post_transformedInt")
                 .addSelectAndMap("IF(LENGTH(post.title > 0), true, false)", "hasTitle", "post_hasTitle", "boolean")
                 .addSelectAndMap(`CONCAT(user.name, " ", user.surname)`, "fullName", "user_fullName")
                 .addSelectAndMap("IF(comments.userId = user.id, true, false)", "opComment", "comments_opComment", "boolean")
@@ -57,6 +59,7 @@ describe("github issues > #296 select additional computed columns", () => {
 
             console.log("post expected", post);
             expect(post).not.to.be.undefined;
+            expect(post!.transformedInt).to.be.a('boolean');
             expect(post!.hasTitle).not.to.be.undefined;
             expect(post!.user!.fullName).not.to.be.undefined;
             post!.comments.forEach(comment => {
@@ -64,4 +67,5 @@ describe("github issues > #296 select additional computed columns", () => {
             });
         }
     })));
+
 });

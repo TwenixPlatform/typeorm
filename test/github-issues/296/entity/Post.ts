@@ -3,6 +3,8 @@ import {PrimaryGeneratedColumn} from "../../../../src";
 import {Column} from "../../../../src";
 import {User} from "./User";
 import {Comment} from "./Comment";
+import {BooleanTransformer} from '../transformers/Boolean.transformer';
+
 
 @Entity()
 export class Post {
@@ -24,4 +26,12 @@ export class Post {
     comments: Comment[];
 
     hasTitle?: boolean;
+
+    @Column({
+        type: "tinyint",
+        width: 1,
+        nullable: true,
+        transformer: new BooleanTransformer(),
+    })
+    transformedInt?: boolean;
 }
